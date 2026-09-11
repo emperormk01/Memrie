@@ -1,0 +1,17 @@
+{
+  "name": "memrie",
+  "version": "0.2.0",
+  "description": "Memory product - context builder, embedding cache, tiered memory",
+  "type": "module",
+  "scripts": {
+    "serve": "bun run src/server.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
