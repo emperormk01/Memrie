@@ -135,7 +135,7 @@ curl "http://localhost:3000/memory/semantic?q=pricing"
 
 ## Zero infra by design
 
-Default is one file: `memrie.db` via `bun:sqlite`.
+Default is one file: `memrie.db` via SQLite.
 
 No Postgres. No Redis. No Docker. SQLite plus sqlite-vec style search in plain JS works for up to tens of thousands of entries.
 
@@ -147,7 +147,7 @@ Memrie does not care what agent framework you use.
 
 - **JS or TS harness** (Vercel AI SDK, LangChain.js, your own): `import { Memrie } from "memrie"` or call the HTTP sidecar.
 
-- **Python harness** (LangChain, CrewAI, AutoGen): Run the sidecar once `bun run src/server.ts` then `requests.post("http://localhost:3000/context/build", json={...})`. No npm at runtime. A thin `pip install memrie` wrapper can be added later that just wraps the HTTP calls.
+- **Python harness** (LangChain, CrewAI, AutoGen): Run the sidecar once `memrie serve` then `requests.post("http://localhost:3000/context/build", json={...})`. No npm at runtime. A thin `pip install memrie` wrapper can be added later that just wraps the HTTP calls.
 
 - **Any other language**: It is just HTTP JSON. `POST /context/build` works from Go, Rust, or curl.
 
@@ -159,28 +159,22 @@ memrie build --query "Where is my order?" --memory ./AGENTS.md
 memrie cache store --query "hello" --answer "world"
 memrie memory semantic --add "User prefers direct answers"
 memrie serve --port 3000
-# via Bun without install
-bun run src/cli.ts --help
-# single binary
-bun build src/cli.ts --compile --outfile memrie && ./memrie --help
+memrie --help
 ```
 
 ### Extractor (turn conversations into AGENTS.md)
 
 ```bash
-curl -fsSL https://bun.sh/install | bash
 export OPENAI_API_KEY=sk-xxx
-bun scripts/extract.ts -m ./AGENTS.md -c ./conversation.txt
+memrie extract -m ./AGENTS.md -c ./conversation.txt
 # From URL
-bun scripts/extract.ts -m ./AGENTS.md -u https://example.com/chat
+memrie extract -m ./AGENTS.md -u https://example.com/chat
 ```
 
 ### Product
 
-```bash
-bun install
-
-# Library
+```ts
+// Library
 import { Memrie } from "./src/index.ts";
 const memrie = new Memrie("./memrie.db");
 const packet = memrie.buildContext({ query, memory, docs, tools, history });
@@ -188,7 +182,7 @@ await memrie.cacheAnswer(query, answer);
 memrie.semantic.add("fact", "source");
 
 # HTTP sidecar
-bun run src/server.ts # -> http://localhost:3000
+memrie serve # -> http://localhost:3000
 ```
 
 ### Configuration

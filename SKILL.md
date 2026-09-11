@@ -22,7 +22,7 @@ Memrie turns conversations into structured memory, packs context within token bu
 
 ### 0. Unified CLI - `memrie this`, `memrie that`
 
-One binary, all features. Run via `bun run src/cli.ts` or compiled `memrie`:
+One binary, all features via `memrie`:
 
 ```bash
 memrie extract -m ./AGENTS.md -c ./chat.txt
@@ -37,7 +37,7 @@ memrie serve --port 3000 --db ./memrie.db
 memrie --help
 ```
 
-Build a single file binary: `bun build src/cli.ts --compile --outfile memrie` (5 to 6 MB stripped).
+Build a single file binary: 5 to 6 MB stripped.
 
 ### 1. Extractor (turn conversations into AGENTS.md)
 
@@ -50,8 +50,7 @@ OPENAI_BASE_URL=https://api.groq.com/openai/v1 memrie extract -m ./AGENTS.md -c 
 memrie extract -m ./AGENTS.md -c ./chat.txt -o /tmp/out.md
 memrie extract --help
 
-# Legacy direct (still works)
-bun scripts/extract.ts -m ./AGENTS.md -c ./conversation.txt
+# Legacy direct still works via scripts/extract.ts if needed
 ```
 
 Extractor does: two-pass extraction, merge with existing memory, dedup, validation loop (3 retries), hard cap 3,000 tokens via 4-char principle.
@@ -103,9 +102,11 @@ memrie.semantic.pin(id);
 ### 3. HTTP sidecar (any language, zero npm stress)
 
 ```bash
-bun run src/server.ts
+memrie serve
 # or
-PORT=3000 bun run src/server.ts
+memrie serve --port 3000 --db ./memrie.db
+# also:
+# PORT=3000 memrie serve
 ```
 
 Endpoints:
