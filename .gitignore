@@ -4,3 +4,4 @@ memrie.db
 memrie.db-journal
 .env
 *.log
+Memrie-agents.md
