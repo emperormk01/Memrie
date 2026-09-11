@@ -42,23 +42,16 @@ Build a single file binary: `bun build src/cli.ts --compile --outfile memrie` (5
 ### 1. Extractor (turn conversations into AGENTS.md)
 
 ```bash
-# From file
+# Unified CLI (preferred)
+memrie extract -m ./AGENTS.md -c ./conversation.txt
+memrie extract -m ./AGENTS.md --text "conversation text"
+memrie extract -m ./AGENTS.md -u https://example.com/chat
+OPENAI_BASE_URL=https://api.groq.com/openai/v1 memrie extract -m ./AGENTS.md -c ./chat.txt
+memrie extract -m ./AGENTS.md -c ./chat.txt -o /tmp/out.md
+memrie extract --help
+
+# Legacy direct (still works)
 bun scripts/extract.ts -m ./AGENTS.md -c ./conversation.txt
-
-# From raw text
-bun scripts/extract.ts -m ./AGENTS.md --text "conversation text"
-
-# From URL
-bun scripts/extract.ts -m ./AGENTS.md -u https://example.com/chat
-
-# Custom endpoint
-OPENAI_BASE_URL=https://api.groq.com/openai/v1 bun scripts/extract.ts -m ./AGENTS.md -c ./chat.txt
-
-# Dry run to file
-bun scripts/extract.ts -m ./AGENTS.md -c ./chat.txt -o /tmp/out.md
-
-# Help
-bun scripts/extract.ts --help
 ```
 
 Extractor does: two-pass extraction, merge with existing memory, dedup, validation loop (3 retries), hard cap 3,000 tokens via 4-char principle.
@@ -161,10 +154,10 @@ prompt = r.json()["prompt"]
 
 ## How to choose
 
-- Need to update AGENTS.md after a chat? Use `scripts/extract.ts`.
-- Need to pack context before an LLM call with docs and tools? Use `buildContext` or `POST /context/build`.
-- Need to save cost on repeat queries? Use `cacheAnswer` / `cachedQuery` or `/cache/*`.
-- Need to remember what happened? Use working for now, episodic for events, semantic for facts.
+- Need to update AGENTS.md after a chat? Use `memrie extract`.
+- Need to pack context before an LLM call with docs and tools? Use `memrie build` or `buildContext` or `POST /context/build`.
+- Need to save cost on repeat queries? Use `memrie cache` or `cacheAnswer` / `cachedQuery` or `/cache/*`.
+- Need to remember what happened? Use `memrie memory` or working for now, episodic for events, semantic for facts.
 
 ## Tips
 
