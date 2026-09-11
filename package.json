@@ -1,6 +1,6 @@
 {
-  "name": "@emperormk01/memrie",
-  "version": "0.2.2",
+  "name": "memrie-cli",
+  "version": "0.2.3",
   "description": "Memory product - context builder, embedding cache, tiered memory",
   "type": "module",
   "scripts": {
