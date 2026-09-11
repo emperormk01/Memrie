@@ -187,6 +187,47 @@ bun install
 bun run src/cli.ts --help
 ```
 
+## MCP server (for Mastra, PydanticAI, Vercel, OpenAI Agents, Claude)
+
+Any MCP client sees Memrie as native tools. One process, 7 tools:
+
+- `memrie_build_context` - packed prompt
+- `memrie_cache_lookup` / `memrie_cache_store`
+- `memrie_memory_add` / `memrie_memory_recall`
+- `memrie_episodic_add` / `memrie_working_add`
+
+```bash
+memrie mcp
+# stdio transport, no port needed
+```
+
+Config for your harness (Mastra, Claude Code, etc.):
+
+```json
+{
+  "mcpServers": {
+    "memrie": {
+      "command": "memrie",
+      "args": ["mcp"],
+      "env": { "MEMRIE_DB": "./memrie.db" }
+    }
+  }
+}
+```
+
+Or with Bun without install:
+
+```json
+{
+  "mcpServers": {
+    "memrie": {
+      "command": "bun",
+      "args": ["run", "/path/to/Memrie/src/mcp.ts"]
+    }
+  }
+}
+```
+
 ## Quick start - unified CLI `memrie this`, `memrie that`
 
 ```bash

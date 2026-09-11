@@ -56,6 +56,8 @@ Commands:
     --port <port>           Port (default 3000)
     --db <path>             SQLite path (default ./memrie.db)
 
+  mcp                     Start MCP server (stdio) for Mastra, PydanticAI, etc.
+
   --help, -h              Show this help
   --version, -v           Show version
 
@@ -65,6 +67,7 @@ Examples:
   memrie cache store --query "How to debounce?" --answer "Use setTimeout..."
   memrie memory semantic --add "User prefers direct answers"
   memrie serve --port 3000
+  memrie mcp
 `);
 }
 
@@ -179,6 +182,10 @@ async function runServe() {
   await import("./server.ts");
 }
 
+async function runMcp() {
+  await import("./mcp.ts");
+}
+
 async function main() {
   if (!cmd || cmd === "--help" || cmd === "-h" || cmd === "help") return help();
   if (cmd === "--version" || cmd === "-v") {
@@ -191,6 +198,7 @@ async function main() {
   if (cmd === "cache") return runCache();
   if (cmd === "memory") return runMemory();
   if (cmd === "serve") return runServe();
+  if (cmd === "mcp") return runMcp();
   console.error(`Unknown command: ${cmd}`);
   help();
   process.exit(1);
