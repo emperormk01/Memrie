@@ -26,8 +26,15 @@ export class LocalEmbedder implements Embedder {
 }
 
 export class GoogleEmbedder implements Embedder {
-  private d = 768;
-  constructor(private apiKey: string, private model = "text-embedding-004") {}
+  private d: number;
+  constructor(private apiKey: string, private model = "gemini-embedding-001") {
+    // normalize aliases: gemini-embedding-1 -> 001, gemini-embedding-2 stays
+    if (this.model === "gemini-embedding-1") this.model = "gemini-embedding-001";
+    // dims by model
+    if (this.model.includes("gemini-embedding")) this.d = 3072;
+    else if (this.model === "text-embedding-004") this.d = 768;
+    else this.d = 768;
+  }
   dims() { return this.d; }
   async embed(text: string): Promise<number[]> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:embedContent?key=${this.apiKey}`;
@@ -40,6 +47,8 @@ export class GoogleEmbedder implements Embedder {
     const data: any = await res.json();
     const values = data.embedding?.values;
     if (!values) throw new Error("Google embed: no values");
+    // update dims to actual returned length
+    this.d = values.length;
     // normalize
     const norm = Math.sqrt(values.reduce((s: number, v: number) => s + v * v, 0)) || 1;
     return values.map((v: number) => v / norm);
@@ -68,7 +77,7 @@ export class OpenAIEmbedder implements Embedder {
 export function createEmbedder(): Embedder {
   const kind = (process.env.MEMRIE_EMBEDDER || "local").toLowerCase();
   if (kind === "google" && process.env.GOOGLE_API_KEY) {
-    return new GoogleEmbedder(process.env.GOOGLE_API_KEY, process.env.GOOGLE_EMBED_MODEL || "text-embedding-004");
+    return new GoogleEmbedder(process.env.GOOGLE_API_KEY, process.env.GOOGLE_EMBED_MODEL || "gemini-embedding-001");
   }
   if (kind === "openai" && process.env.OPENAI_API_KEY) {
     return new OpenAIEmbedder(process.env.OPENAI_API_KEY, process.env.OPENAI_BASE_URL, process.env.OPENAI_MODEL_EMBED);
