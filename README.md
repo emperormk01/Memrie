@@ -167,19 +167,16 @@ curl -L https://github.com/emperormk01/Memrie/releases/latest/download/memrie-li
 # also: memrie-linux-arm64, memrie-darwin-x64, memrie-darwin-arm64
 ```
 
-New releases are built only when you push a tag `v*` (e.g. `git tag v0.2.1 && git push origin v0.2.1`). Commits without tags do nothing.
-
 ### Option 2: npm (for JS/TS harnesses)
 
 ```bash
-npm install -g memrie
-# or
-bunx memrie --help
-# or
-npx memrie --help
+npm install -g memrie-cli
+# or without install
+bunx memrie-cli --help
+npx memrie-cli --help
+# binary is still `memrie`
+memrie --help
 ```
-
-Requires `NPM_TOKEN` secret for publishing. Workflow `.github/workflows/npm.yml` publishes on `v*` tags.
 
 ### Option 3: From source (dev)
 
