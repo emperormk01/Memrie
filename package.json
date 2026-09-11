@@ -1,6 +1,6 @@
 {
   "name": "memrie-cli",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Memory product - context builder, embedding cache, tiered memory",
   "type": "module",
   "scripts": {
