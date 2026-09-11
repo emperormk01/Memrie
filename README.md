@@ -2,7 +2,6 @@
 
 Extract and compress conversation context into structured `AGENTS.md` memory blocks. Works with any OpenAI-compatible API.
 
-Renamed from memory-extraction, now provider agnostic.
 
 ## Structure
 
