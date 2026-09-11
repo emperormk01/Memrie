@@ -151,7 +151,19 @@ Memrie does not care what agent framework you use.
 
 - **Any other language**: It is just HTTP JSON. `POST /context/build` works from Go, Rust, or curl.
 
-## Quick start
+## Quick start - unified CLI `memrie this`, `memrie that`
+
+```bash
+memrie extract -m ./AGENTS.md -c ./chat.txt
+memrie build --query "Where is my order?" --memory ./AGENTS.md
+memrie cache store --query "hello" --answer "world"
+memrie memory semantic --add "User prefers direct answers"
+memrie serve --port 3000
+# via Bun without install
+bun run src/cli.ts --help
+# single binary
+bun build src/cli.ts --compile --outfile memrie && ./memrie --help
+```
 
 ### Extractor (turn conversations into AGENTS.md)
 

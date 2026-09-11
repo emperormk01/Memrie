@@ -20,6 +20,25 @@ Memrie turns conversations into structured memory, packs context within token bu
 
 ## Commands
 
+### 0. Unified CLI - `memrie this`, `memrie that`
+
+One binary, all features. Run via `bun run src/cli.ts` or compiled `memrie`:
+
+```bash
+memrie extract -m ./AGENTS.md -c ./chat.txt
+memrie build --query "Where is my order?" --memory ./AGENTS.md --docs ./docs.json
+memrie cache store --query "How to debounce?" --answer "Use setTimeout..."
+memrie cache lookup --query "How to debounce?"
+memrie cache stats
+memrie memory working --add "deploy failed"
+memrie memory episodic --add "deployment success" --search "deploy"
+memrie memory semantic --add "User prefers direct answers" --search "direct"
+memrie serve --port 3000 --db ./memrie.db
+memrie --help
+```
+
+Build a single file binary: `bun build src/cli.ts --compile --outfile memrie` (5 to 6 MB stripped).
+
 ### 1. Extractor (turn conversations into AGENTS.md)
 
 ```bash
