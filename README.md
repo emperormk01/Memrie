@@ -151,6 +151,21 @@ Memrie does not care what agent framework you use.
 
 - **Any other language**: It is just HTTP JSON. `POST /context/build` works from Go, Rust, or curl.
 
+## Install via GitHub Releases (no npm)
+
+```bash
+# One-liner (detects OS/arch, installs to ~/.local/bin)
+curl -fsSL https://raw.githubusercontent.com/emperormk01/Memrie/main/install.sh | bash
+
+# Minimal (downloads to current dir)
+curl -fsSL https://raw.githubusercontent.com/emperormk01/Memrie/main/get.sh | bash
+
+# Direct binary
+curl -L https://github.com/emperormk01/Memrie/releases/latest/download/memrie-linux-x64 -o /usr/local/bin/memrie && chmod +x /usr/local/bin/memrie
+```
+
+New releases are built only when you push a tag `v*` (e.g. `git tag v0.2.1 && git push origin v0.2.1`). Commits without tags do nothing on Releases.
+
 ## Quick start - unified CLI `memrie this`, `memrie that`
 
 ```bash
