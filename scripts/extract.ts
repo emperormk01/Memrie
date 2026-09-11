@@ -25,6 +25,8 @@ const DEFAULT_API_KEY = process.env.OPENAI_API_KEY || "";
 const DEFAULT_BASE_URL = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
 const DEFAULT_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
 const DEFAULT_MAX_CHARS = 50000; // Max characters before truncation
+const MAX_TOKENS = 3000; // Hard cap for AGENTS.md
+const MAX_CHARS_MEM = MAX_TOKENS * 4; // 4-char principle: 1 token ≈ 4 chars => 12000 chars
 
 // Parse CLI arguments
 const { values } = parseArgs({
@@ -164,6 +166,55 @@ function formatMemory(block: MemoryBlock): string {
   output += `## Earlier context\n${block.earlierContext.join("\n\n")}\n\n`;
   output += `## Long-term background\n${block.longTermBackground.map(i => `- ${i}`).join("\n")}\n`;
   return output;
+}
+
+function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
+}
+
+function enforceCap(block: MemoryBlock): MemoryBlock {
+  let out = formatMemory(block);
+  let tokens = estimateTokens(out);
+  if (tokens <= MAX_TOKENS) return block;
+
+  console.error(`AGENTS.md ${tokens} tokens (${out.length} chars) exceeds ${MAX_TOKENS} cap, trimming...`);
+
+  // Trim in priority: earlier context -> brief history -> long-term -> top of mind -> truncate work/personal
+  const clone: MemoryBlock = {
+    workContext: block.workContext,
+    personalContext: block.personalContext,
+    topOfMind: [...block.topOfMind],
+    briefHistory: [...block.briefHistory],
+    earlierContext: [...block.earlierContext],
+    longTermBackground: [...block.longTermBackground],
+  };
+
+  while (estimateTokens(formatMemory(clone)) > MAX_TOKENS) {
+    if (clone.earlierContext.length > 0) {
+      clone.earlierContext.pop();
+    } else if (clone.briefHistory.length > 1) {
+      clone.briefHistory.pop();
+    } else if (clone.longTermBackground.length > 1) {
+      clone.longTermBackground.pop();
+    } else if (clone.topOfMind.length > 1) {
+      clone.topOfMind.pop();
+    } else {
+      // Last resort: hard truncate longest text field
+      const longest = [
+        { k: "workContext" as const, v: clone.workContext },
+        { k: "personalContext" as const, v: clone.personalContext },
+        { k: "brief" as const, v: clone.briefHistory[0] || "" },
+      ].sort((a, b) => b.v.length - a.v.length)[0];
+      if (longest.k === "workContext") clone.workContext = clone.workContext.slice(0, -200);
+      else if (longest.k === "personalContext") clone.personalContext = clone.personalContext.slice(0, -200);
+      else clone.briefHistory[0] = clone.briefHistory[0].slice(0, -200);
+      if (clone.workContext.length < 10) break;
+    }
+  }
+
+  const final = formatMemory(clone);
+  console.error(`Trimmed to ${estimateTokens(final)} tokens (${final.length} chars)`);
+  return clone;
 }
 
 async function callLLM(prompt: string, maxTokens: number = 3000): Promise<string> {
@@ -383,8 +434,18 @@ async function main() {
     process.exit(1);
   }
 
+  // Enforce hard cap before writing
+  updatedMemory = enforceCap(updatedMemory);
+
   // Format output
   const output = formatMemory(updatedMemory);
+  const tokens = estimateTokens(output);
+  console.error(`AGENTS.md: ${tokens}/${MAX_TOKENS} tokens (${output.length}/${MAX_CHARS_MEM} chars) - 4-char principle`);
+
+  if (tokens > MAX_TOKENS) {
+    console.error(`ERROR: Still over cap after trimming (${tokens} > ${MAX_TOKENS}), aborting`);
+    process.exit(1);
+  }
 
   // Write to file or stdout
   if (values.output) {
